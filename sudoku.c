@@ -44,9 +44,8 @@ void scores(void){
 	fflush(stdin);
 	getchar();
 	system("CLS");
-	menu();
 	fclose(f);
-	
+	return;
 }
 void menu(void){
 	while(1)
@@ -67,6 +66,9 @@ void menu(void){
 	}
 	
 }
+
+
+
 void show(int alan[][9],int seviye){
 	int i,j;
  	 for(i=0;i<11;i++)
@@ -94,9 +96,7 @@ void show(int alan[][9],int seviye){
 				else          
 					printf("|   ");                 
 			}    
-				
-			
-					
+							
 		}
 		printf("|\n");
 		if(seviye>=3&&i==8)break;
