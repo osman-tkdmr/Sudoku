@@ -2,32 +2,32 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+
 int space;
 void scores(void);
 void menu(void);
-void show(int alan[][9],int seviye);
+void show(int alan[][9], int seviye);
 int zorluk(int alan[][9]);
 void oyun(int alan[][9]);
 int kotrol(int alan[][9]);
 int oyuncu(int alan[][9], int seviye);
-void kayit(int zaman,int seviye);
+void kayit(int zaman, int seviye);
+
 int main() {
-	int sat, sut, v;
-	int zaman, seviye, ctrl;
-	int alan[11][9]={0};
-	menu();
-	oyun(alan);
-	seviye = zorluk(alan);
-	show(alan,seviye);
-	zaman=oyuncu(alan,seviye);
-	ctrl = kotrol(alan);
-	if(ctrl)
-	kayit(zaman,seviye);
-	fflush(stdin);
-	getchar();
-    
-	return 0;
-} 
+    int alan[11][9] = {0};
+    menu();
+    oyun(alan);
+    int seviye = zorluk(alan);
+    show(alan, seviye);
+    int zaman = oyuncu(alan, seviye);
+    int ctrl = kotrol(alan);
+    if (ctrl)
+        kayit(zaman, seviye);
+    fflush(stdin);
+    getchar();
+    return 0;
+}
+
 void scores(void){
 	FILE *f;
 	if((f=fopen("scores.txt","r"))==NULL)
@@ -72,13 +72,31 @@ void show(int alan[][9],int seviye){
  	 for(i=0;i<11;i++)
 	{
 		if(i==9)
-		printf("+---+---+---+---+---+---+---+---+---+\n\n\n");
+		printf("+---+---+---\033[0;33m+\033[0m---+---+---\033[0;33m+\033[0m---+---+---+\n\n\n");
+		if(i==3||i==6)
+		printf("\033[0;33m+---+---+---+---+---+---+---+---+---+\033[0m\n");
+		else if(i<9)
+		printf("+---+---+---\033[0;33m+\033[0m---+---+---\033[0;33m+\033[0m---+---+---+\n");
+		else
 		printf("+---+---+---+---+---+---+---+---+---+\n");
 		for(j=0;j<9;j++)
 		{
-			if(alan[i][j]!=0)
-			printf("| %d ",alan[i][j]);
-			else printf("|   ");
+			if(alan[i][j]!=0){
+				 if((j==3||j==6)&&i<9)
+						printf("\033[0;33m|\033[0m %d ",alan[i][j]);
+					else
+						printf("| %d ",alan[i][j]);
+			}
+		  
+			else{
+				if((j==3||j==6)&&i<9)
+					printf("\033[0;33m|\033[0m   ");
+				else          
+					printf("|   ");                 
+			}    
+				
+			
+					
 		}
 		printf("|\n");
 		if(seviye>=3&&i==8)break;
@@ -277,47 +295,60 @@ int oyuncu(int alan[][9], int seviye){
 	return zaman;
 	
 }
-void kayit(int zaman,int seviye){
-	int p=0,len;
-	char ch, head[50],diff[10];
-	struct tm *tarih;
-	time_t loc;
-	loc = time(NULL);
-	tarih=localtime(&loc);
-	
-	FILE *f;
-	f=fopen("scores.txt","a+");
-	
-	strcpy(head,"======================== SCORES ========================\n\n");
-	while(!feof(f))
-	{
-		ch=fgetc(f);
-		p++;
-	}
-	//printf("%d\n",p);
-	if(p<=1)
-	fprintf(f,head);
-	len=strlen(head);
-	fclose(f);
-	f=fopen("scores.txt","a+");
-	if(seviye==1)strcpy(diff,"BABY");
-	else if(seviye==2)strcpy(diff,"EASY");
-	else if(seviye==3)strcpy(diff,"HARD");
-	else strcpy(diff,"IMPOSIBLE");
-	
-	p=0;
-	while(!feof(f))
-	{
-		ch=fgetc(f);
-		p++;
-		
-	}
-	
-	//printf("%d\n",p);
-	 
-	fprintf(f,"%d)%.24s      %.2d h %.2d m %.2d s %s\n", (p-(len+1))/(47+strlen(diff))+1, asctime(tarih), zaman/3600, zaman/60, zaman%60,diff);
-	fclose(f);
-	
-	return;
-}
 
+void kayit(int zaman, int seviye) {
+    FILE *f;
+    char line[200];
+    int max_entry = 0;
+    struct tm *tarih;
+    time_t loc;
+    char diff[10];
+    
+    f = fopen("scores.txt", "r");
+    if (f != NULL) {
+        while (fgets(line, sizeof(line), f)) {
+            int num;
+            if (sscanf(line, "%d)", &num) == 1) {
+                if (num > max_entry) {
+                    max_entry = num;
+                }
+            }
+        }
+        fclose(f);
+    }
+    
+    f = fopen("scores.txt", "a");
+    if (f == NULL) {
+        printf("Cannot open scores file for writing.\n");
+        return;
+    }
+    
+    if (max_entry == 0) {
+        fprintf(f, "======================== SCORES ========================\n\n");
+    }
+    
+    loc = time(NULL);
+    tarih = localtime(&loc);
+
+    switch(seviye) {
+        case 1: strcpy(diff, "BABY"); break;
+        case 2: strcpy(diff, "EASY"); break;
+        case 3: strcpy(diff, "HARD"); break;
+        case 4: strcpy(diff, "IMPOSIBLE"); break;
+        default: strcpy(diff, "UNKNOWN"); break;
+    }
+    
+    int hours = zaman / 3600;
+    int minutes = (zaman % 3600) / 60;
+    int seconds = zaman % 60;
+    
+    fprintf(f, "%d)%.24s      %02d h %02d m %02d s %s\n",
+            max_entry + 1,
+            asctime(tarih),
+            hours,
+            minutes,
+            seconds,
+            diff);
+
+    fclose(f);
+}
