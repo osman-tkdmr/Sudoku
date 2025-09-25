@@ -13,6 +13,23 @@ int kotrol(int alan[][9]);
 int oyuncu(int alan[][9], int seviye);
 void kayit(int zaman, int seviye);
 
+void clearScreen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+void waitForEnter() {
+    int c;
+    // Önce tamponu temizle
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    printf("Devam etmek için Enter tuşuna basın...");
+    getchar();  // Kullanıcı Enter basana kadar bekle
+}
+
 int main() {
     int alan[11][9] = {0};
     menu();
@@ -24,7 +41,7 @@ int main() {
     if (ctrl)
         kayit(zaman, seviye);
     fflush(stdin);
-    getchar();
+    waitForEnter();
     return 0;
 }
 
@@ -34,7 +51,8 @@ void scores(void){
 	{
 		printf("hic scor bulunamadi\n");
 		fflush(stdin);
-		getchar();system("CLS");
+		waitForEnter();
+		clearScreen();
 		return;
 	}
 	while(!feof(f))
@@ -42,8 +60,8 @@ void scores(void){
 		printf("%c", fgetc(f));
 	}
 	fflush(stdin);
-	getchar();
-	system("CLS");
+	waitForEnter();
+	clearScreen();
 	fclose(f);
 	return;
 }
@@ -61,7 +79,7 @@ void menu(void){
 	    	case 1: return ; break;
 	    	case 2: scores(); break;
 	    	case 3: exit(0) ; break; 
-	    	default: system("CLS");menu(); 
+	    	default: clearScreen();menu(); 
 		}
 	}
 	
@@ -107,7 +125,7 @@ int zorluk(int alan[][9]){
 	int i,seviye,sat,sut;
 	while(1)
 	{
-		system("CLS");
+		clearScreen();
 		printf("1)baby\n"
 	           "2)easy\n"
 	           "3)hard\n"
@@ -132,7 +150,7 @@ int zorluk(int alan[][9]){
 		}
 		else i--;
 	}
-	system("CLS");
+	clearScreen();
 	return seviye;
 }
 void oyun(int alan[][9]){
@@ -231,7 +249,7 @@ int kotrol(int alan[][9]){
 	}
 	else 
 	{
-		printf("kaybettiniz!!!\n");getchar();
+		printf("kaybettiniz!!!\n");waitForEnter();
 		return 0;
 	}
 }
@@ -247,7 +265,7 @@ int oyuncu(int alan[][9], int seviye){
 		if(err==0)
 		{
 			fflush(stdin);
-			system("CLS");
+			clearScreen();
 			show(alan,seviye);
 			goto git;
 		}
@@ -256,7 +274,7 @@ int oyuncu(int alan[][9], int seviye){
 		if(err==0)
 		{
 			fflush(stdin);
-			system("CLS");
+			clearScreen();
 			show(alan,seviye);
 			goto git;
 		}
@@ -265,11 +283,11 @@ int oyuncu(int alan[][9], int seviye){
 		if(err==0)
 		{
 			fflush(stdin);
-			system("CLS");
+			clearScreen();
 			show(alan,seviye);
 			goto git;
 		}
-		system("CLS");
+		clearScreen();
 		if(sat<9&&sat>=0&&sut<9&&sut>=0&&v<=9&&v>=0)
 		{
 			if(v==0)
